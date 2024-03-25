@@ -75,8 +75,7 @@ public class AsteroidListActivity extends AppCompatActivity {
                     JSONObject asteroid = asteroids.getJSONObject(index);
                     JSONArray approachData = asteroid.getJSONArray("close_approach_data");
                     JSONObject missDistance = approachData.getJSONObject(0).getJSONObject("miss_distance");
-                    double magnitude = Double.parseDouble(String.format(Locale.US,"%.1f", asteroid.getDouble("absolute_magnitude_h")));
-                    asteroidsData.add(new AsteroidModel(asteroid.getString("name"), magnitude, missDistance.getInt("kilometers")));
+                    asteroidsData.add(new AsteroidModel(asteroid.getString("name"), asteroid.getDouble("absolute_magnitude_h"), missDistance.getInt("kilometers")));
                 }
             } catch (JSONException e) {
                 throw new RuntimeException(e);
