@@ -5,6 +5,24 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/cardview_dark_background"
     tools:context=".Home">
 
+    <TextView
+        android:id="@+id/asteroidText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/nombre_d_ast_roides_0"
+        android:textColor="@color/white"
+        android:textSize="20sp"
+        tools:layout_editor_absoluteX="99dp"
+        tools:layout_editor_absoluteY="65dp" />
+
+    <ListView
+        android:id="@+id/listView"
+        android:layout_width="409dp"
+        android:layout_height="622dp"
+        tools:layout_editor_absoluteX="1dp"
+        tools:layout_editor_absoluteY="108dp"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

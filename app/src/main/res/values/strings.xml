@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Asteroide Detector</string>
+    <string name="vide">\"\"</string>
+    <string name="commencer">Commencer</string>
+    <string name="d_couvrez_les_ast_ro_des_en_approche_de_la_terre">DÉCOUVREZ LES ASTÉROÏDES EN APPROCHE DE LA TERRE !</string>
+    <string name="todo">TODO</string>
+    <string name="nombre_d_ast_roides_0">Nombre d\'astéroides : 0</string>
 </resources>
