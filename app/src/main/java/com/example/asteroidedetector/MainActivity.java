@@ -2,7 +2,6 @@ package com.example.asteroidedetector;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -28,6 +27,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onClickButtonStart(View v){
-        startActivity(new Intent(getApplicationContext(), Home.class));
+        startActivity(new Intent(getApplicationContext(), AsteroidListActivity.class));
     }
 }

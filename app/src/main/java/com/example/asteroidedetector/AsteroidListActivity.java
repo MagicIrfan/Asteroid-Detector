@@ -1,7 +1,6 @@
 package com.example.asteroidedetector;
 
 import android.os.Bundle;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +14,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.android.volley.*;
 import com.android.volley.toolbox.*;
+import com.example.asteroidedetector.adapters.AsteroidArrayAdapter;
+import com.example.asteroidedetector.model.AsteroidModel;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,7 +24,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Home extends AppCompatActivity {
+public class AsteroidListActivity extends AppCompatActivity {
 
     private ListView listView;
     private TextView textView;
@@ -32,7 +33,7 @@ public class Home extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_asteroid_list);
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -59,28 +60,28 @@ public class Home extends AppCompatActivity {
                         throw new RuntimeException(e);
                     }
                 },
-                error -> {
-                    Toast.makeText(getApplicationContext(), "Erreur lors de la récupération des informations !",Toast.LENGTH_SHORT).show();
-                }
+                error -> Toast.makeText(getApplicationContext(), "Erreur lors de la récupération des informations !",Toast.LENGTH_SHORT).show()
         );
     }
 
     private void handleResponse(JSONObject response) throws JSONException{
         Toast.makeText(getApplicationContext(), "Données reçues !",Toast.LENGTH_SHORT).show();
-        List<String> asteroidName = new ArrayList<>();
+        List<AsteroidModel> asteroidsData = new ArrayList<>();
         JSONObject jsonObject = (JSONObject) response.get("near_earth_objects");
         jsonObject.keys().forEachRemaining(key -> {
             try {
-                JSONArray asteroids = (JSONArray) jsonObject.get(key);
+                JSONArray asteroids = jsonObject.getJSONArray(key);
                 for (int index = 0; index < asteroids.length(); index++) {
                     JSONObject asteroid = asteroids.getJSONObject(index);
-                    asteroidName.add((String) asteroid.get("name"));
+                    JSONArray approachData = asteroid.getJSONArray("close_approach_data");
+                    JSONObject missDistance = approachData.getJSONObject(0).getJSONObject("miss_distance");
+                    asteroidsData.add(new AsteroidModel(asteroid.getString("name"), asteroid.getDouble("absolute_magnitude_h"), missDistance.getDouble("kilometers")));
                 }
             } catch (JSONException e) {
                 throw new RuntimeException(e);
             }
         });
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.row_layout,R.id.textview, asteroidName);
+        AsteroidArrayAdapter adapter = new AsteroidArrayAdapter(getApplicationContext(),asteroidsData);
         listView.setAdapter(adapter);
         textView.setText(getString(R.string.nombre_asteroides, response.getInt("element_count")));
     }
