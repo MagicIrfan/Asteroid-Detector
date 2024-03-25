@@ -7,5 +7,5 @@
     <string name="nombre_d_ast_roides_0">Nombre d\'astéroides : 0</string>
     <string name="nombre_asteroides">Nombre d\'astéroides : %1$d</string>
     <string name="magnitude">Magnitude : %1$f</string>
-    <string name="distance">Distance : %1$f</string>
+    <string name="distance">Distance : %1$d km</string>
 </resources>

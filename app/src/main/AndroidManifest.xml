@@ -13,9 +13,9 @@
         android:theme="@style/Theme.AsteroideDetector"
         tools:targetApi="31">
         <activity
-            android:name=".AsteroidListActivity"
+            android:name=".asteroid.AsteroidListActivity"
             android:exported="false" />
-        <activity android:name=".MainActivity"
+        <activity android:name=".main.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

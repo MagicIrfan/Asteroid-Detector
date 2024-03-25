@@ -1,12 +1,12 @@
-package com.example.asteroidedetector.model;
+package com.example.asteroidedetector.asteroid;
 
 public class AsteroidModel {
 
     private String name;
     private double magnitude;
-    private double distance;
+    private int distance;
 
-    public AsteroidModel(String name, double magnitude, double distance) {
+    public AsteroidModel(String name, double magnitude, int distance) {
         this.name = name;
         this.magnitude = magnitude;
         this.distance = distance;
@@ -28,11 +28,11 @@ public class AsteroidModel {
         this.magnitude = magnitude;
     }
 
-    public double getDistance() {
+    public int getDistance() {
         return distance;
     }
 
-    public void setDistance(double distance) {
+    public void setDistance(int distance) {
         this.distance = distance;
     }
 }

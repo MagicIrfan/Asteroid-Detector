@@ -1,4 +1,4 @@
-package com.example.asteroidedetector.adapters;
+package com.example.asteroidedetector.asteroid;
 
 import android.content.*;
 import android.view.LayoutInflater;
@@ -10,9 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 
 import com.example.asteroidedetector.R;
-import com.example.asteroidedetector.model.AsteroidModel;
 
-import java.text.DecimalFormat;
 import java.util.List;
 
 public class AsteroidArrayAdapter extends ArrayAdapter<AsteroidModel> {

@@ -1,4 +1,4 @@
-package com.example.asteroidedetector;
+package com.example.asteroidedetector.asteroid;
 
 import android.os.Bundle;
 import android.widget.ListView;
@@ -14,8 +14,7 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.android.volley.*;
 import com.android.volley.toolbox.*;
-import com.example.asteroidedetector.adapters.AsteroidArrayAdapter;
-import com.example.asteroidedetector.model.AsteroidModel;
+import com.example.asteroidedetector.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -23,6 +22,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class AsteroidListActivity extends AppCompatActivity {
 
@@ -33,14 +33,14 @@ public class AsteroidListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_asteroid_list);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+        setContentView(com.example.asteroidedetector.R.layout.activity_asteroid_list);
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(com.example.asteroidedetector.R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        listView = (ListView) findViewById(R.id.listView);
-        textView = (TextView) findViewById(R.id.asteroidText);
+        listView = (ListView) findViewById(com.example.asteroidedetector.R.id.listView);
+        textView = (TextView) findViewById(com.example.asteroidedetector.R.id.asteroidText);
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         JsonObjectRequest jsonObjectRequest = getJsonObjectRequest();
         queue.add(jsonObjectRequest);
@@ -75,7 +75,8 @@ public class AsteroidListActivity extends AppCompatActivity {
                     JSONObject asteroid = asteroids.getJSONObject(index);
                     JSONArray approachData = asteroid.getJSONArray("close_approach_data");
                     JSONObject missDistance = approachData.getJSONObject(0).getJSONObject("miss_distance");
-                    asteroidsData.add(new AsteroidModel(asteroid.getString("name"), asteroid.getDouble("absolute_magnitude_h"), missDistance.getDouble("kilometers")));
+                    double magnitude = Double.parseDouble(String.format(Locale.US,"%.1f", asteroid.getDouble("absolute_magnitude_h")));
+                    asteroidsData.add(new AsteroidModel(asteroid.getString("name"), magnitude, missDistance.getInt("kilometers")));
                 }
             } catch (JSONException e) {
                 throw new RuntimeException(e);
