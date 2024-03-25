@@ -1,11 +1,7 @@
 package com.example.asteroidedetector;
 
-import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,10 +21,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 public class Home extends AppCompatActivity {
+
+    private ListView listView;
+    private TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -39,47 +38,50 @@ public class Home extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        ListView listView = (ListView) findViewById(R.id.listView);
-        TextView textView = (TextView) findViewById(R.id.asteroidText);
-        final Integer[] asteroidNumber = {0};
+        listView = (ListView) findViewById(R.id.listView);
+        textView = (TextView) findViewById(R.id.asteroidText);
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        JsonObjectRequest jsonObjectRequest = getJsonObjectRequest();
+        queue.add(jsonObjectRequest);
+    }
+
+    @NonNull
+    private JsonObjectRequest getJsonObjectRequest() {
         String url = "https://api.nasa.gov/neo/rest/v1/feed?start_date=2015-09-07&end_date=2015-09-08&api_key=e1GkZAJUw7hBH1YakSEVcpICtmpZ8SYe7YyelilN";
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
+        return new JsonObjectRequest(
                 Request.Method.GET,
                 url,
                 null,
-                new Response.Listener<JSONObject>() {
-                    @SuppressLint("SetTextI18n")
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        Toast.makeText(getApplicationContext(), "Données reçues !",Toast.LENGTH_SHORT).show();
-                        List<String> asteroidName = new ArrayList<>();
-                        try {
-                            JSONObject jsonObject = (JSONObject) response.get("near_earth_objects");
-                            for (Iterator<String> it = jsonObject.keys(); it.hasNext(); ) {
-                                String key = it.next();
-                                JSONArray asteroids = (JSONArray) jsonObject.get(key);
-                                for (int i = 0; i < asteroids.length(); i++) {
-                                    JSONObject asteroid = asteroids.getJSONObject(i); // Obtenez chaque objet du tableau comme un JSONObject
-                                    asteroidName.add((String) asteroid.get("name"));
-                                }
-                                asteroidNumber[0] += asteroids.length();
-                            }
-                            ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.row_layout,R.id.textview, asteroidName);
-                            listView.setAdapter(adapter);
-                        } catch (JSONException e) {
-                            throw new RuntimeException(e);
-                        }
-                        textView.setText("Nombre d'astéroides : " + asteroidNumber[0]);
+                response -> {
+                    try {
+                        handleResponse(response);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
                     }
                 },
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        // Gérez les erreurs ici
-                    }
+                error -> {
+                    Toast.makeText(getApplicationContext(), "Erreur lors de la récupération des informations !",Toast.LENGTH_SHORT).show();
                 }
         );
-        queue.add(jsonObjectRequest);
+    }
+
+    private void handleResponse(JSONObject response) throws JSONException{
+        Toast.makeText(getApplicationContext(), "Données reçues !",Toast.LENGTH_SHORT).show();
+        List<String> asteroidName = new ArrayList<>();
+        JSONObject jsonObject = (JSONObject) response.get("near_earth_objects");
+        jsonObject.keys().forEachRemaining(key -> {
+            try {
+                JSONArray asteroids = (JSONArray) jsonObject.get(key);
+                for (int index = 0; index < asteroids.length(); index++) {
+                    JSONObject asteroid = asteroids.getJSONObject(index);
+                    asteroidName.add((String) asteroid.get("name"));
+                }
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getApplicationContext(), R.layout.row_layout,R.id.textview, asteroidName);
+        listView.setAdapter(adapter);
+        textView.setText(getString(R.string.nombre_asteroides, response.getInt("element_count")));
     }
 }
