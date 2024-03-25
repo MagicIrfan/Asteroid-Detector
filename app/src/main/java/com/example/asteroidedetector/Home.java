@@ -1,11 +1,13 @@
 package com.example.asteroidedetector;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -38,6 +40,8 @@ public class Home extends AppCompatActivity {
             return insets;
         });
         ListView listView = (ListView) findViewById(R.id.listView);
+        TextView textView = (TextView) findViewById(R.id.asteroidText);
+        final Integer[] asteroidNumber = {0};
         RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
         String url = "https://api.nasa.gov/neo/rest/v1/feed?start_date=2015-09-07&end_date=2015-09-08&api_key=e1GkZAJUw7hBH1YakSEVcpICtmpZ8SYe7YyelilN";
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(
@@ -45,6 +49,7 @@ public class Home extends AppCompatActivity {
                 url,
                 null,
                 new Response.Listener<JSONObject>() {
+                    @SuppressLint("SetTextI18n")
                     @Override
                     public void onResponse(JSONObject response) {
                         Toast.makeText(getApplicationContext(), "Données reçues !",Toast.LENGTH_SHORT).show();
@@ -58,12 +63,14 @@ public class Home extends AppCompatActivity {
                                     JSONObject asteroid = asteroids.getJSONObject(i); // Obtenez chaque objet du tableau comme un JSONObject
                                     asteroidName.add((String) asteroid.get("name"));
                                 }
+                                asteroidNumber[0] += asteroids.length();
                             }
                             ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(), R.layout.row_layout,R.id.textview, asteroidName);
                             listView.setAdapter(adapter);
                         } catch (JSONException e) {
                             throw new RuntimeException(e);
                         }
+                        textView.setText("Nombre d'astéroides : " + asteroidNumber[0]);
                     }
                 },
                 new Response.ErrorListener() {
