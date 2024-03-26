@@ -10,6 +10,7 @@
     tools:context=".activity.AsteroidActivity">
 
     <LinearLayout
+        android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="80dp"
@@ -59,5 +60,17 @@
             android:layout_height="wrap_content"
             android:textAlignment="center" />
     </LinearLayout>
+
+    <com.example.asteroidedetector.views.CustomCircleView
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="248dp"
+        app:circleColor="@color/yellow"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
