@@ -6,18 +6,25 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-public class SolarSystemView extends View {
+public class SolarSystemView extends View{
 
     private Paint paintSun, paintEarth, paintOrbitSun, paintOrbitEarth, paintMoon;
     private float earthOrbitDegree = 0f;
     private float moonOrbitDegree = 0f;
     private float orbitalPeriod;
+    private boolean animate;
+    private float animationSpeed = 1f;
+
+    private GestureDetector gestureDetector;
 
     public SolarSystemView(Context context) {
         super(context);
@@ -39,15 +46,15 @@ public class SolarSystemView extends View {
     }
 
     public void startAnimation() {
+        animate = true;
         new Thread(() -> {
-
-            while (true) { // Boucle infinie pour l'animation
+            while (animate) { // Boucle infinie pour l'animation
                 float earthRotationIncrement = 360f / orbitalPeriod; // L'incrément de rotation de la Terre par image
                 float asteroidRotationIncrement = earthRotationIncrement * 2; // L'astéroïde tourne deux fois plus vite
-                earthOrbitDegree += earthRotationIncrement; // La vitesse de rotation de la Terre
+                earthOrbitDegree += (earthRotationIncrement * animationSpeed); // La vitesse de rotation de la Terre
                 if (earthOrbitDegree > 360) earthOrbitDegree -= 360;
 
-                moonOrbitDegree += asteroidRotationIncrement; // La vitesse de rotation de l'astéroïde
+                moonOrbitDegree += (asteroidRotationIncrement * animationSpeed); // La vitesse de rotation de l'astéroïde
                 if (moonOrbitDegree > 360) moonOrbitDegree -= 360;
                 // Demander à la vue de se redessiner
                 postInvalidate();
@@ -61,7 +68,46 @@ public class SolarSystemView extends View {
         }).start();
     }
 
+    public void stopAnimation(){
+        animate = false;
+    }
+
+    public boolean isAnimate(){
+        return animate;
+    }
+
     private void init(AttributeSet attrs, int defStyle) {
+        gestureDetector = new GestureDetector(this.getContext(), new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onDoubleTap(MotionEvent e) {
+                if (isAnimate()) {
+                    stopAnimation();
+                } else {
+                    startAnimation();
+                }
+                return true;
+            }
+
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                // Votre logique pour le tap simple ici
+                return true;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                // Logique de défilement
+                if (e1 != null && e2 != null) {
+                    if(animationSpeed >= 0f){
+                        animationSpeed -= (distanceY/100f);
+                    }
+                    else{
+                        animationSpeed = 0f;
+                    }
+                }
+                return true;
+            }
+        });
         // Initialiser le Paint pour le Soleil
         paintSun = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintSun.setStyle(Paint.Style.FILL);
@@ -88,6 +134,11 @@ public class SolarSystemView extends View {
         paintMoon = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintMoon.setStyle(Paint.Style.FILL);
         paintMoon.setColor(Color.GRAY); // Lune grise
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return gestureDetector.onTouchEvent(event) || super.onTouchEvent(event);
     }
 
     @Override

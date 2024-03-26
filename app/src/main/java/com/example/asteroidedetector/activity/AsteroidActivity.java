@@ -1,10 +1,16 @@
 package com.example.asteroidedetector.activity;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.widget.TextView;
-import android.widget.Toast;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
+import android.view.View;
+import android.widget.*;
 
 import androidx.activity.EdgeToEdge;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -22,6 +28,8 @@ public class AsteroidActivity extends AppCompatActivity {
     private TextView orbitalPeriod;
     private SolarSystemView solarSystemView;
     private AsteroidService asteroidService;
+    private Button likeButton;
+    private SharedPreferences settings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,6 +47,8 @@ public class AsteroidActivity extends AppCompatActivity {
         this.distance = findViewById(R.id.asteroidDistance);
         this.orbitalPeriod = findViewById(R.id.periodeOrbitale);
         this.solarSystemView = findViewById(R.id.solarSystemView);
+        this.likeButton = findViewById(R.id.likeButton);
+        this.settings = getSharedPreferences("asteroid", MODE_PRIVATE);
         asteroidService = AsteroidService.getInstance(getApplicationContext());
         asteroidService.getAsteroid(id)
                 .then(response -> {
@@ -48,7 +58,26 @@ public class AsteroidActivity extends AppCompatActivity {
                     orbitalPeriod.setText(getString(R.string.periode_orbitale,response.getOrbitalPeriod()));
                     solarSystemView.setOrbitalPeriod(response.getOrbitalPeriod());
                     solarSystemView.startAnimation();
+                    likeButton.setText(id != 0 && settings.contains(String.valueOf(id)) ? getString(R.string.dislike) : getString(R.string.like));
                 })
                 .error(error -> Toast.makeText(getApplicationContext(), "Erreur lors de la récupération des informations !",Toast.LENGTH_SHORT).show());
+    }
+
+    public void onClickLikeButton(View view) {
+        int id = getIntent().getIntExtra("id", 0);
+        SharedPreferences.Editor editor = settings.edit();
+
+        if (id != 0 && settings.contains(String.valueOf(id))) {
+            editor.remove(String.valueOf(id));
+            likeButton.setText(getString(R.string.like));
+        } else {
+            editor.putBoolean(String.valueOf(id), true);
+            likeButton.setText(getString(R.string.dislike));
+        }
+        editor.apply();
+    }
+
+    public void onClickReturnButton(View view) {
+        startActivity(new Intent(getApplicationContext(), AsteroidListActivity.class));
     }
 }

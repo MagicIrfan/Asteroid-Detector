@@ -9,4 +9,7 @@
     <string name="magnitude">Magnitude : %1$.1f</string>
     <string name="distance">Distance : %1$d km</string>
     <string name="periode_orbitale">Période orbitale : %1$d</string>
+    <string name="like">Like</string>
+    <string name="dislike">Dislike</string>
+    <string name="retour">Retour</string>
 </resources>
