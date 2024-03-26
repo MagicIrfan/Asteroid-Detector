@@ -27,10 +27,8 @@ public class AsteroidActivity extends AppCompatActivity {
     private TextView distance;
     private TextView orbitalPeriod;
     private SolarSystemView solarSystemView;
-    private AsteroidService asteroidService;
     private Button likeButton;
     private SharedPreferences settings;
-    private GestureDetector gestureDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,7 +48,7 @@ public class AsteroidActivity extends AppCompatActivity {
         this.solarSystemView = findViewById(R.id.solarSystemView);
         this.likeButton = findViewById(R.id.likeButton);
         this.settings = getSharedPreferences("asteroid", MODE_PRIVATE);
-        asteroidService = AsteroidService.getInstance(getApplicationContext());
+        AsteroidService asteroidService = AsteroidService.getInstance(getApplicationContext());
         asteroidService.getAsteroid(id)
                 .then(response -> {
                     name.setText(response.getName());
@@ -61,7 +59,7 @@ public class AsteroidActivity extends AppCompatActivity {
                     likeButton.setText(id != 0 && settings.contains(String.valueOf(id)) ? getString(R.string.dislike) : getString(R.string.like));
                 })
                 .error(error -> Toast.makeText(getApplicationContext(), "Erreur lors de la récupération des informations !",Toast.LENGTH_SHORT).show());
-        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+        GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
                 if (e1.getX() > e2.getX()) {
