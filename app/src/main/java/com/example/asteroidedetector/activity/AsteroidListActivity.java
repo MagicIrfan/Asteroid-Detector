@@ -42,35 +42,13 @@ public class AsteroidListActivity extends AppCompatActivity {
         this.asteroidService = AsteroidService.getInstance(getApplicationContext());
         this.listView = (ListView) findViewById(R.id.listView);
         this.textView = (TextView) findViewById(R.id.asteroidText);
-        asteroidService.getAsteroids(response -> {
-            Toast.makeText(getApplicationContext(), "Données reçues !",Toast.LENGTH_SHORT).show();
-                    try {
-                        handleResponse(response);
-                    } catch (JSONException e) {
-                        throw new RuntimeException(e);
-                    }
-                },
-        error -> Toast.makeText(getApplicationContext(), "Erreur lors de la récupération des informations !",Toast.LENGTH_SHORT).show());
-    }
-
-    private void handleResponse(JSONObject response) throws JSONException{
-        List<AsteroidModel> asteroidsData = new ArrayList<>();
-        JSONObject jsonObject = (JSONObject) response.get("near_earth_objects");
-        jsonObject.keys().forEachRemaining(key -> {
-            try {
-                JSONArray asteroids = jsonObject.getJSONArray(key);
-                for (int index = 0; index < asteroids.length(); index++) {
-                    JSONObject asteroid = asteroids.getJSONObject(index);
-                    JSONArray approachData = asteroid.getJSONArray("close_approach_data");
-                    JSONObject missDistance = approachData.getJSONObject(0).getJSONObject("miss_distance");
-                    asteroidsData.add(new AsteroidModel(asteroid.getString("name"), asteroid.getDouble("absolute_magnitude_h"), missDistance.getInt("kilometers")));
-                }
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-        });
-        AsteroidArrayAdapter adapter = new AsteroidArrayAdapter(getApplicationContext(),asteroidsData);
-        listView.setAdapter(adapter);
-        textView.setText(getString(R.string.nombre_asteroides, response.getInt("element_count")));
+        asteroidService.getAsteroids()
+                .then(response -> {
+                    Toast.makeText(getApplicationContext(), "Données reçues !",Toast.LENGTH_SHORT).show();
+                    AsteroidArrayAdapter adapter = new AsteroidArrayAdapter(getApplicationContext(),response);
+                    listView.setAdapter(adapter);
+                    textView.setText(getString(R.string.nombre_asteroides, response.size()));
+                })
+                .error(error -> Toast.makeText(getApplicationContext(), "Erreur lors de la récupération des informations !",Toast.LENGTH_SHORT).show());
     }
 }
