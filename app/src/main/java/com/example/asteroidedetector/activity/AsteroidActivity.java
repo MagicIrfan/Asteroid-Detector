@@ -30,6 +30,7 @@ public class AsteroidActivity extends AppCompatActivity {
     private AsteroidService asteroidService;
     private Button likeButton;
     private SharedPreferences settings;
+    private GestureDetector gestureDetector;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,11 +57,19 @@ public class AsteroidActivity extends AppCompatActivity {
                     magnitude.setText(getString(R.string.magnitude,response.getMagnitude()));
                     distance.setText(getString(R.string.distance,response.getDistance()));
                     orbitalPeriod.setText(getString(R.string.periode_orbitale,response.getOrbitalPeriod()));
-                    solarSystemView.setOrbitalPeriod(response.getOrbitalPeriod());
-                    solarSystemView.startAnimation();
+                    solarSystemView.setAsteroid(response);
                     likeButton.setText(id != 0 && settings.contains(String.valueOf(id)) ? getString(R.string.dislike) : getString(R.string.like));
                 })
                 .error(error -> Toast.makeText(getApplicationContext(), "Erreur lors de la récupération des informations !",Toast.LENGTH_SHORT).show());
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                if (e1.getX() > e2.getX()) {
+                    onFlingToLeft();
+                }
+                return super.onFling(e1, e2, velocityX, velocityY);
+            }
+        });
     }
 
     public void onClickLikeButton(View view) {
@@ -77,7 +86,7 @@ public class AsteroidActivity extends AppCompatActivity {
         editor.apply();
     }
 
-    public void onClickReturnButton(View view) {
+    public void onFlingToLeft() {
         startActivity(new Intent(getApplicationContext(), AsteroidListActivity.class));
     }
 }

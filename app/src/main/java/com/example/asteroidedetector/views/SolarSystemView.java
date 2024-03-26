@@ -15,16 +15,16 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.example.asteroidedetector.model.AsteroidDetailModel;
+
 public class SolarSystemView extends View{
 
     private Paint paintSun, paintEarth, paintOrbitSun, paintOrbitEarth, paintMoon;
-    private float earthOrbitDegree = 0f;
-    private float moonOrbitDegree = 0f;
-    private float orbitalPeriod;
-    private boolean animate;
-    private float animationSpeed = 1f;
-
+    private boolean animated;
+    private int frame;
+    private int delayMs = 60;
     private GestureDetector gestureDetector;
+    private AsteroidDetailModel asteroid;
 
     public SolarSystemView(Context context) {
         super(context);
@@ -41,68 +41,32 @@ public class SolarSystemView extends View{
         init(attrs, defStyle);
     }
 
-    public void setOrbitalPeriod(float period) {
-        this.orbitalPeriod = period;
-    }
-
-    public void startAnimation() {
-        animate = true;
-        new Thread(() -> {
-            while (animate) { // Boucle infinie pour l'animation
-                float earthRotationIncrement = 360f / orbitalPeriod; // L'incrément de rotation de la Terre par image
-                float asteroidRotationIncrement = earthRotationIncrement * 2; // L'astéroïde tourne deux fois plus vite
-                earthOrbitDegree += (earthRotationIncrement * animationSpeed); // La vitesse de rotation de la Terre
-                if (earthOrbitDegree > 360) earthOrbitDegree -= 360;
-
-                moonOrbitDegree += (asteroidRotationIncrement * animationSpeed); // La vitesse de rotation de l'astéroïde
-                if (moonOrbitDegree > 360) moonOrbitDegree -= 360;
-                // Demander à la vue de se redessiner
-                postInvalidate();
-
-                try {
-                    Thread.sleep(16); // Pause pour un taux de rafraîchissement d'environ 60 FPS
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    public void stopAnimation(){
-        animate = false;
-    }
-
-    public boolean isAnimate(){
-        return animate;
+    public void setAsteroid(AsteroidDetailModel asteroid){
+        this.asteroid = asteroid;
+        this.invalidate();
     }
 
     private void init(AttributeSet attrs, int defStyle) {
+        animated = true;
         gestureDetector = new GestureDetector(this.getContext(), new GestureDetector.SimpleOnGestureListener() {
             @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                if (isAnimate()) {
-                    stopAnimation();
-                } else {
-                    startAnimation();
-                }
+            public boolean onDoubleTap(@NonNull MotionEvent e) {
+                animated = !animated;
                 return true;
             }
 
             @Override
-            public boolean onSingleTapConfirmed(MotionEvent e) {
-                // Votre logique pour le tap simple ici
+            public boolean onSingleTapConfirmed(@NonNull MotionEvent e) {
                 return true;
             }
 
             @Override
-            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+            public boolean onScroll(MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
                 // Logique de défilement
-                if (e1 != null && e2 != null) {
-                    if(animationSpeed >= 0f){
-                        animationSpeed -= (distanceY/100f);
-                    }
-                    else{
-                        animationSpeed = 0f;
+                if (e1 != null) {
+                    delayMs = distanceY<0 ? delayMs-1 : delayMs+1;
+                    if(delayMs<=0){
+                        delayMs=1;
                     }
                 }
                 return true;
@@ -143,35 +107,33 @@ public class SolarSystemView extends View{
 
     @Override
     protected void onDraw(@NonNull Canvas canvas) {
-        super.onDraw(canvas);
+        float width = getWidth();
+        float height = getHeight();
 
-        // Dimensions de la vue
-        int width = getWidth();
-        int height = getHeight();
+        canvas.translate(width/2, height/2);
+        canvas.drawCircle(0, 0, 100, paintSun);
+        canvas.drawCircle(0, 0, width/2 - 50, paintOrbitEarth);
+        canvas.save();
+        canvas.rotate(frame % 360, 0, 0);
+        canvas.translate(width/2 - 50, 0);
+        canvas.drawCircle(0, 0, 50, paintEarth);
 
-        // Dessiner le Soleil au centre
-        float sunRadius = height / 15f; // Taille du Soleil
-        canvas.drawCircle(width / 2f, height / 2f, sunRadius, paintSun);
+        if (asteroid != null) {
+            int DISTANCE_EARTH_SUN = 149597870;
+            float radiusAsteroid = (asteroid.getDistance() * (width / 2 - 50) / DISTANCE_EARTH_SUN);
+            canvas.drawCircle(0, 0, radiusAsteroid, paintOrbitSun);
+            canvas.save();
+            canvas.rotate((frame * (asteroid.getOrbitalPeriod() / 10f)) % 360, 0, 0);
+            canvas.drawCircle(-radiusAsteroid, 0, 20, paintMoon);
+        }
+        canvas.restore();
 
-        // Dessiner l'orbite de la Terre
-        float orbitEarthRadius = height / 3f; // Rayon de l'orbite de la Terre
-        canvas.drawCircle(width / 2f, height / 2f, orbitEarthRadius, paintOrbitEarth);
-
-        // Dessiner la Terre sur son orbite autour du Soleil
-        float earthRadius = height / 25f; // Taille de la Terre
-        float earthX = (float) (width / 2 + orbitEarthRadius * Math.cos(Math.toRadians(earthOrbitDegree)));
-        float earthY = (float) (height / 2 + orbitEarthRadius * Math.sin(Math.toRadians(earthOrbitDegree)));
-        canvas.drawCircle(earthX, earthY, earthRadius, paintEarth);
-
-        // Dessiner l'orbite de la Lune autour de la Terre
-        float orbitMoonRadius = earthRadius * 2; // La Lune est plus proche de la Terre dans notre modèle
-        canvas.drawCircle(earthX, earthY, orbitMoonRadius, paintOrbitEarth); // Utiliser paintOrbitEarth pour la simplicité
-
-        // Dessiner la Lune sur son orbite autour de la Terre
-        float moonRadius = earthRadius / 3; // Taille de la Lune par rapport à celle de la Terre
-        float moonX = (float) (earthX + orbitMoonRadius * Math.cos(Math.toRadians(moonOrbitDegree))); // Choisir un angle pour positionner la Lune
-        float moonY = (float) (earthY + orbitMoonRadius * Math.sin(Math.toRadians(moonOrbitDegree)));
-        canvas.drawCircle(moonX, moonY, moonRadius, paintMoon);
+        postDelayed(() -> {
+            if(animated){
+                frame++;
+            }
+            invalidate();
+        }, delayMs);
     }
 }
 

@@ -23,7 +23,6 @@ public class AsteroidListActivity extends AppCompatActivity implements AdapterVi
 
     private ListView listView;
     private TextView textView;
-    private AsteroidService asteroidService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,9 +34,9 @@ public class AsteroidListActivity extends AppCompatActivity implements AdapterVi
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
-        this.asteroidService = AsteroidService.getInstance(getApplicationContext());
-        this.listView = (ListView) findViewById(R.id.listView);
-        this.textView = (TextView) findViewById(R.id.asteroidText);
+        AsteroidService asteroidService = AsteroidService.getInstance(getApplicationContext());
+        this.listView = findViewById(R.id.listView);
+        this.textView = findViewById(R.id.asteroidText);
         asteroidService.getAsteroids()
                 .then(response -> {
                     Toast.makeText(getApplicationContext(), "Données reçues !",Toast.LENGTH_SHORT).show();
