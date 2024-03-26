@@ -1,17 +1,18 @@
 package com.example.asteroidedetector.model;
 
-public class AsteroidModel {
-
+public class AsteroidDetailModel {
     private final String id;
     private String name;
     private double magnitude;
     private int distance;
+    private int orbitalPeriod;
 
-    public AsteroidModel(String id, String name, double magnitude, int distance) {
+    public AsteroidDetailModel(String id, String name, double magnitude, int distance, int orbitalPeriod) {
         this.id = id;
         this.name = name;
         this.magnitude = magnitude;
         this.distance = distance;
+        this.orbitalPeriod = orbitalPeriod;
     }
 
     public String getId() {
@@ -40,5 +41,9 @@ public class AsteroidModel {
 
     public void setDistance(int distance) {
         this.distance = distance;
+    }
+
+    public int getOrbitalPeriod() {
+        return orbitalPeriod;
     }
 }

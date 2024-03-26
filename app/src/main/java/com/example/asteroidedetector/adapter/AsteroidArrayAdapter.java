@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -50,7 +51,7 @@ public class AsteroidArrayAdapter extends ArrayAdapter<AsteroidModel> {
         asteroidName.setText(asteroid.getName());
         asteroidMagnitude.setText(context.getString(R.string.magnitude, asteroid.getMagnitude()));
         asteroidDistance.setText(context.getString(R.string.distance, asteroid.getDistance()));
-
+        convertView.setId(Integer.parseInt(asteroid.getId()));
         return convertView;
     }
 }
