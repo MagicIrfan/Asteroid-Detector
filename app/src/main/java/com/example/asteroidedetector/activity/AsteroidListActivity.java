@@ -1,4 +1,4 @@
-package com.example.asteroidedetector.asteroid;
+package com.example.asteroidedetector.activity;
 
 import android.os.Bundle;
 import android.widget.ListView;
@@ -6,15 +6,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
-import com.android.volley.*;
-import com.android.volley.toolbox.*;
 import com.example.asteroidedetector.R;
+import com.example.asteroidedetector.adapter.AsteroidArrayAdapter;
+import com.example.asteroidedetector.model.AsteroidModel;
+import com.example.asteroidedetector.service.AsteroidService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,7 +22,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class AsteroidListActivity extends AppCompatActivity {
 

@@ -1,4 +1,4 @@
-package com.example.asteroidedetector.main;
+package com.example.asteroidedetector.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,7 +12,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import com.example.asteroidedetector.R;
-import com.example.asteroidedetector.asteroid.AsteroidListActivity;
+import com.example.asteroidedetector.activity.AsteroidListActivity;
 
 public class MainActivity extends AppCompatActivity {
 

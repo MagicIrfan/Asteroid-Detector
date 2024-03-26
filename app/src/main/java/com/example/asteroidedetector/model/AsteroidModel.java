@@ -1,4 +1,4 @@
-package com.example.asteroidedetector.asteroid;
+package com.example.asteroidedetector.model;
 
 public class AsteroidModel {
 
