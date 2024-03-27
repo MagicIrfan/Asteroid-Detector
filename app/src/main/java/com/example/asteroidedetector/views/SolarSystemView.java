@@ -22,7 +22,7 @@ public class SolarSystemView extends View{
     private Paint paintSun, paintEarth, paintOrbitSun, paintOrbitEarth, paintMoon;
     private boolean animated;
     private int frame;
-    private int delayMs = 60;
+    private int delayMs = 30;
     private GestureDetector gestureDetector;
     private AsteroidDetailModel asteroid;
 
@@ -62,7 +62,6 @@ public class SolarSystemView extends View{
 
             @Override
             public boolean onScroll(MotionEvent e1, @NonNull MotionEvent e2, float distanceX, float distanceY) {
-                // Logique de défilement
                 if (e1 != null) {
                     delayMs = distanceY<0 ? delayMs-1 : delayMs+1;
                     if(delayMs<=0){

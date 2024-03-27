@@ -85,6 +85,6 @@ public class AsteroidActivity extends AppCompatActivity {
     }
 
     public void onFlingToLeft() {
-        startActivity(new Intent(getApplicationContext(), AsteroidListActivity.class));
+        finish();
     }
 }
