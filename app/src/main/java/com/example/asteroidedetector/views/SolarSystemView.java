@@ -122,7 +122,7 @@ public class SolarSystemView extends View{
             float radiusAsteroid = (asteroid.getDistance() * (width / 2 - 50) / DISTANCE_EARTH_SUN);
             canvas.drawCircle(0, 0, radiusAsteroid, paintOrbitSun);
             canvas.save();
-            canvas.rotate((frame * (asteroid.getOrbitalPeriod() / 10f)) % 360, 0, 0);
+            canvas.rotate(frame  % 360 * 365f/asteroid.getOrbitalPeriod(), 0, 0);
             canvas.drawCircle(-radiusAsteroid, 0, 20, paintMoon);
         }
         canvas.restore();

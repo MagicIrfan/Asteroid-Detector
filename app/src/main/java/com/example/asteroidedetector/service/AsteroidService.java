@@ -46,8 +46,7 @@ public class AsteroidService {
 
     public Promise<List<AsteroidModel>> getAsteroids() {
         Promise<List<AsteroidModel>> promise = new Promise<>();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.US);
-        String today = dateFormat.format(new Date());
+        String today = getTodaysDate();
         String apiUrl = "https://api.nasa.gov/neo/rest/v1/feed?start_date=%s&end_date=%s&api_key=%s";
         apiUrl = String.format(apiUrl,today,today,API_KEY);
         JsonObjectRequest request = new JsonObjectRequest(
@@ -119,14 +118,13 @@ public class AsteroidService {
     }
 
     private AsteroidModel getAsteroidFromJSONObject(JSONObject response) throws JSONException {
-        JSONArray approachData = response.getJSONArray("close_approach_data");
-        JSONObject missDistance = approachData.getJSONObject(0).getJSONObject("miss_distance");
-        return new AsteroidModel(response.getString("id"), response.getString("name"), response.getDouble("absolute_magnitude_h"), missDistance.getInt("kilometers"));
+        JSONObject missDistance = getTodaysMissDistance(response);
+        return new AsteroidModel(response.getString("id"), response.getString("name"), response.getDouble("absolute_magnitude_h"), missDistance != null ? missDistance.getInt("kilometers") : 0);
     }
 
     private AsteroidDetailModel getAsteroidDetailFromJSONObject(JSONObject response) throws JSONException {
         AsteroidModel asteroid = getAsteroidFromJSONObject(response);
-        int orbitalPeriod = response.getJSONArray("close_approach_data").getJSONObject(0).getJSONObject("miss_distance").getInt("lunar");
+        int orbitalPeriod = response.getJSONObject("orbital_data").getInt("orbital_period");
         return new AsteroidDetailModel(
                 asteroid.getId(),
                 asteroid.getName(),
@@ -134,5 +132,26 @@ public class AsteroidService {
                 asteroid.getDistance(),
                 orbitalPeriod
                 );
+    }
+
+    private JSONObject getTodaysMissDistance(JSONObject response) throws JSONException {
+        JSONArray closeApproachData = response.getJSONArray("close_approach_data");
+        String today = getTodaysDate();
+
+        for (int i = 0; i < closeApproachData.length(); i++) {
+            JSONObject approachData = closeApproachData.getJSONObject(i);
+            if (isTodaysDate(approachData, today)) {
+                return approachData.getJSONObject("miss_distance");
+            }
+        }
+        return null;
+    }
+
+    private String getTodaysDate() {
+        return new SimpleDateFormat("yyyy-MM-dd",Locale.US).format(new Date());
+    }
+
+    private boolean isTodaysDate(JSONObject approachData, String today) throws JSONException {
+        return approachData.getString("close_approach_date").equals(today);
     }
 }

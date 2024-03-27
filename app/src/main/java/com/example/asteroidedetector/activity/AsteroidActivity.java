@@ -27,7 +27,7 @@ public class AsteroidActivity extends AppCompatActivity {
     private TextView distance;
     private TextView orbitalPeriod;
     private SolarSystemView solarSystemView;
-    private Button likeButton;
+    private ImageView likeButton;
     private SharedPreferences settings;
 
     @Override
@@ -56,12 +56,12 @@ public class AsteroidActivity extends AppCompatActivity {
                     distance.setText(getString(R.string.distance,response.getDistance()));
                     orbitalPeriod.setText(getString(R.string.periode_orbitale,response.getOrbitalPeriod()));
                     solarSystemView.setAsteroid(response);
-                    likeButton.setText(id != 0 && settings.contains(String.valueOf(id)) ? getString(R.string.dislike) : getString(R.string.like));
+                    likeButton.setImageResource(settings.getBoolean(String.valueOf(id),false)  ? android.R.drawable.btn_star_big_on : android.R.drawable.btn_star_big_off);
                 })
                 .error(error -> Toast.makeText(getApplicationContext(), "Erreur lors de la récupération des informations !",Toast.LENGTH_SHORT).show());
         GestureDetector gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
-            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+            public boolean onFling(MotionEvent e1, @NonNull MotionEvent e2, float velocityX, float velocityY) {
                 if (e1.getX() > e2.getX()) {
                     onFlingToLeft();
                 }
@@ -73,13 +73,12 @@ public class AsteroidActivity extends AppCompatActivity {
     public void onClickLikeButton(View view) {
         int id = getIntent().getIntExtra("id", 0);
         SharedPreferences.Editor editor = settings.edit();
-
-        if (id != 0 && settings.contains(String.valueOf(id))) {
-            editor.remove(String.valueOf(id));
-            likeButton.setText(getString(R.string.like));
+        if (settings.getBoolean(String.valueOf(id), false)) {
+            editor.putBoolean(String.valueOf(id), false);
+            likeButton.setImageResource(android.R.drawable.btn_star_big_off);
         } else {
             editor.putBoolean(String.valueOf(id), true);
-            likeButton.setText(getString(R.string.dislike));
+            likeButton.setImageResource(android.R.drawable.btn_star_big_on);
         }
         editor.apply();
     }
